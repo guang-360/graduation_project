@@ -165,7 +165,7 @@ from matplotlib import pyplot as plt
 # Otsu的二值化
 # from pip._vendor.msgpack.fallback import xrange
 #
-# img = cv.imread('cat.jpg', 0)
+# img = cv.imread('drop.jpg', 0)
 # ret, thresh1 = cv.threshold(img, 127, 255, cv.THRESH_BINARY)
 # ret, thresh2 = cv.threshold(img, 127, 255, cv.THRESH_BINARY_INV)
 # ret, thresh3 = cv.threshold(img, 127, 255, cv.THRESH_TRUNC)
@@ -258,27 +258,27 @@ from matplotlib import pyplot as plt
 # # flag=2，原深度，1通道 $
 # # flag=3, 原深度，3通道
 # # flag=4，8位深度 ，3通道
-#
+
 # imgray = cv.cvtColor(original, cv.COLOR_BGR2GRAY)
 #
+# ret, thresh = cv.threshold(imgray, 127, 255, 8)
 # # 当使用了THRESH_OTSU和THRESH_TRIANGLE两个标志时，输入图像必须为单通道。
 # #  ret： 与参数thresh一致
 # #  dst： 结果图像
-# ret, thresh = cv.threshold(imgray, 127, 255, 8)
 # # 参数8表示使用THRESH_TRIANGLE
 #
 # contours, hierarchy = cv.findContours(thresh, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-# con = cv.drawContours(img2, contours, -1, (255, 255, 0), 3)
+# con = cv.drawContours(img2, contours, -1, (0, 255, 255), 3)
 # # cnt = contours[3]
 # # con2 = cv.drawContours(img, [cnt], -1, (0,255,0), 2)
 #
 # # canny边缘检测
 #
-# edges2 = cv.Canny(img2, 30, 30)
+# # edges2 = cv.Canny(img2, 30, 30)
+# # plt.subplot(132), plt.title('canny0'), plt.imshow(edges2, cmap='gray')
 #
-# plt.subplot(132), plt.title('canny0'), plt.imshow(edges2, cmap='gray')
-# plt.subplot(131), plt.title('Original'), plt.imshow(original)
-# plt.subplot(133), plt.title('THRESH_TRIANGLE'), plt.imshow(con)
+# plt.subplot(121), plt.title('Original'), plt.imshow(original)
+# plt.subplot(122), plt.title('THRESH_TRIANGLE'), plt.imshow(con)
 #
 #
 # # for cnt in contours:
@@ -367,11 +367,23 @@ from matplotlib import pyplot as plt
 # cv2.waitKey(0)
 # cv2.waitKey(0)
 # cv2.waitKey(0)
-
-# img = cv.imread('drop.jpg', 0)
+#
+img = cv.imread('drop.jpg',0)
 # ret, th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 # th2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-# th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 4)
+# ret, thresh = cv.threshold(th3, 127, 255, 8)
+
+# contours, hierarchy = cv.findContours(th3, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+#
+# # newImage = cv2.imread('white.jpg')
+# # newImage = cv2.resize(newImage,(2560,1920))
+# con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
+plt.imshow(th3, cmap='gray')
+plt.show()
+
+
+
 # titles = ['Original', 'Global Thresholding(v = 127)', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding']
 # images = [img, th1, th2, th3]
 # for i in range(4):
