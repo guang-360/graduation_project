@@ -183,7 +183,7 @@ from matplotlib import pyplot as plt
 # 图像模糊
 # 各种低通滤波器(LPF)，高通滤波器(HPF)等对图像进行滤波。
 # LPF有助于消除噪声，使图像模糊等。HPF滤波器有助于在图像中找到边缘。
-# img = cv.imread('cat.jpg')
+# img = cv.imread('drop.jpg')
 # # 2D卷积（图像过滤）
 # kernel = np.ones((15, 15), np.float32) / 225
 # dst = cv.filter2D(img, -1, kernel)
@@ -207,7 +207,7 @@ from matplotlib import pyplot as plt
 # plt.subplot(235), plt.imshow(median), plt.title('Median')
 # plt.xticks([]), plt.yticks([])
 # plt.subplot(236), plt.imshow(blur_double), plt.title('Double_edge')
-# plt.xticks([]), plt.yticksq1  qqq         111111([])
+# plt.xticks([]), plt.yticks([])
 # plt.show()
 
 
@@ -285,7 +285,6 @@ from matplotlib import pyplot as plt
 # #     perimeter = cv.arcLength(cnt, True)
 # #     print(perimeter)
 # plt.show()
-
 
 
 # 抽象
@@ -369,14 +368,14 @@ from matplotlib import pyplot as plt
 # cv2.waitKey(0)
 # cv2.waitKey(0)
 
-img = cv.imread('drop.jpg',0)
-ret,th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-th2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-titles = ['Original','Global Thresholding(v = 127)','Adaptive Mean Thresholding','Adaptive Gaussian Thresholding']
-images = [img,th1,th2,th3]
-for i in range(4):
-    plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
-plt.show()
+# img = cv.imread('drop.jpg', 0)
+# ret, th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+# th2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+# th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+# titles = ['Original', 'Global Thresholding(v = 127)', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding']
+# images = [img, th1, th2, th3]
+# for i in range(4):
+#     plt.subplot(2, 2, i + 1), plt.imshow(images[i], 'gray')
+#     plt.title(titles[i])
+#     plt.xticks([]), plt.yticks([])
+# plt.show()
