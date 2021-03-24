@@ -14,12 +14,60 @@
 #     print_hi('PyCharm')
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-
-import numpy as np
-import cv2
+from __future__ import print_function
 import cv2 as cv
-from matplotlib import pyplot as plt
+import numpy as np
+import argparse
+import random as rng
+
+rng.seed(12345)
+
+
+def thresh_callback(val):
+    threshold = val
+    # Detect edges using Canny
+    canny_output = cv.Canny(src_gray, threshold, threshold * 2)
+    # Find contours
+    contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    # Draw contours
+    drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
+    # drawing= cv.resize(drawing, (640, 480))
+    for i in range(len(contours)):
+        color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
+        cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+    # Show in a window
+    cv.imshow('Contours', drawing)
+
+
+# Load source image
+parser = argparse.ArgumentParser(description='Code for Finding contours in your image tutorial.')
+parser.add_argument('--input', help='Path to input image.', default='drop.jpg')
+args = parser.parse_args()
+# src = cv.imread(cv.samples.findFile(arg.input))
+src = cv.imread('drop.jpg')
+if src is None:
+    print('Could not open or find the image:', args.input)
+    exit(0)
+src = cv.resize(src, (960, 720))
+# Convert image to gray and blur it
+src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+src_gray = cv.blur(src_gray, (3, 3))
+# Create Window
+source_window = 'Source'
+cv.namedWindow(source_window)
+cv.imshow(source_window, src)
+# cv.resizeWindow(source_window, 640, 480)
+max_thresh = 255
+thresh = 100  # initial threshold
+cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, thresh_callback)
+thresh_callback(thresh)
+cv.waitKey()
+cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2
+# import cv2 as cv
+# from matplotlib import pyplot as plt
 
 # 左键单机画圆
 # def draw_circle(event, x, y, flags, param):
@@ -247,6 +295,24 @@ from matplotlib import pyplot as plt
 # plt.show()
 
 
+# pic = 'drop3.jpg'
+# original = cv.imread(pic)
+# img = cv.imread(pic)
+# imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# ret, thresh = cv.threshold(imgray, 127, 255, 8)
+# contours, hierarchy = cv.findContours(thresh, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+# con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
+# # cnt = contours[3]
+# # con2 = cv.drawContours(img, [cnt], -1, (0,255,0), 2)
+# plt.subplot(121), plt.title('Original'), plt.imshow(original)
+# plt.subplot(122), plt.title('THRESH_TRIANGLE'), plt.imshow(con)
+# # plt.subplot(122), plt.title('Contour'), plt.imshow(con)
+# for cnt in contours:
+#     perimeter = cv.arcLength(cnt, True)
+#     print(perimeter)
+# plt.show()
+
+
 # pic = 'drop.jpg'
 # original = cv.imread(pic)
 #
@@ -368,22 +434,21 @@ from matplotlib import pyplot as plt
 # cv2.waitKey(0)
 # cv2.waitKey(0)
 #
-img = cv.imread('drop.jpg',0)
+# img = cv.imread('drop3.jpg', 0)
 # ret, th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 # th2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 4)
+# th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 4)
 # ret, thresh = cv.threshold(th3, 127, 255, 8)
-
-# contours, hierarchy = cv.findContours(th3, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 #
-# # newImage = cv2.imread('white.jpg')
-# # newImage = cv2.resize(newImage,(2560,1920))
-# con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
-plt.imshow(th3, cmap='gray')
-plt.show()
-
-
-
+# # contours, hierarchy = cv.findContours(th3, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+# #
+# # # newImage = cv2.imread('white.jpg')
+# # # newImage = cv2.resize(newImage,(2560,1920))
+# # con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
+# # plt.imshow(th3, cmap='gray')
+# # plt.show()
+#
+#
 # titles = ['Original', 'Global Thresholding(v = 127)', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding']
 # images = [img, th1, th2, th3]
 # for i in range(4):
