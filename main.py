@@ -12,6 +12,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
+
 #
 # # 引入图像
 # pic = 'drop.jpg'
@@ -87,15 +88,6 @@ import random as rng
 # #     plt.title(titles[i])
 # #     plt.xticks([]), plt.yticks([])
 # # plt.show()
-
-
-
-
-
-
-
-
-
 
 
 # coding=utf-8
@@ -212,62 +204,97 @@ import random as rng
 #     cv2.waitKey(0)
 
 
+# rng.seed(1895)
+#
+# img = cv.imread('drop.jpg')
+
+# def thresh_callback(val):
+#     threshold = val
+#     # Detect edges using Canny
+#     canny_output = cv.Canny(src_gray, threshold, threshold * 2)
+#     # Find contours
+#     contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+#     # Draw contours
+#     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
+#     # drawing= cv.resize(drawing, (640, 480))
+#     # 给轮廓随机取色
+#     print(len(contours))
+#     for i in range(len(contours)):
+#         color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
+#         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+#     # Show in a window
+#     Contour_window = 'Contours'
+#     cv.namedWindow(Contour_window)
+#     cv.imshow(Contour_window, drawing)
+#
+#
+# # Load source image
+# parser = argparse.ArgumentParser(description='Code for Finding contours in your image tutorial.')
+# parser.add_argument('--input', help='Path to input image.', default='drop.jpg')
+# args = parser.parse_args()
+# # src = cv.imread(cv.samples.findFile(arg.input))
+# src = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
+# if src is None:
+#     print('Could not open or find the image:', args.input)
+#     exit(0)
+# # src = cv.resize(src, (960, 720))
+# src = cv.resize(src, (720, 540))
+# # Convert image to gray and blur it
+# src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+# src_gray = cv.blur(src_gray, (3, 3))
+# # Create Window
+# source_window = 'Source'
+# cv.namedWindow(source_window)
+# cv.imshow(source_window, src)
+# bar = 'TrackBar'
+# cv.namedWindow('TrackBar')
+# # cv.resizeWindow(source_window, 640, 480)
+# max_thresh = 255
+# thresh = 100  # initial threshold
+# cv.createTrackbar('Canny Thresh:', bar, thresh, max_thresh, thresh_callback)
+# thresh_callback(thresh)
+# cv.waitKey()
+# cv.destroyAllWindows()
+
 
 rng.seed(1895)
 
-img = cv.imread('drop4.jpg')
+img = cv.imread('drop2.jpg')
+
+img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
+src = cv.resize(img, (720, 540))
+src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+src_gray = cv.blur(src_gray, (3, 3))
 
 
-def thresh_callback(val):
-    threshold = val
-    # Detect edges using Canny
-    canny_output = cv.Canny(src_gray, threshold, threshold * 2)
-    # Find contours
-    contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+def find_thresh():
+    for threshold in range(255, 50, -1):
+        # Detect edges using Canny
+        canny_output = cv.Canny(src_gray, threshold, threshold * 2)
+        # Find contours
+        contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        if len(contours) == 4:
+            break
     # Draw contours
+    print(threshold)
+
     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
     # drawing= cv.resize(drawing, (640, 480))
     # 给轮廓随机取色
     for i in range(len(contours)):
         color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+    for cnt in contours:
+        perimeter = round(cv.arcLength(cnt, False), 1)
+        print(perimeter)
+        cv.putText(drawing, str(perimeter), tuple(cnt[0][0]+[-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
+    # print(contours[0])
     # Show in a window
     Contour_window = 'Contours'
     cv.namedWindow(Contour_window)
     cv.imshow(Contour_window, drawing)
+    cv.imshow('original', src)
+    cv.waitKey()
 
 
-# Load source image
-parser = argparse.ArgumentParser(description='Code for Finding contours in your image tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='drop.jpg')
-args = parser.parse_args()
-# src = cv.imread(cv.samples.findFile(arg.input))
-src = img[120:1800, 160:2400]  #去掉上下文字信息，避免干扰，得到src比例为
-if src is None:
-    print('Could not open or find the image:', args.input)
-    exit(0)
-# src = cv.resize(src, (960, 720))
-src = cv.resize(src, (720, 540))
-# Convert image to gray and blur it
-src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-src_gray = cv.blur(src_gray, (3, 3))
-# Create Window
-source_window = 'Source'
-cv.namedWindow(source_window)
-cv.imshow(source_window, src)
-bar = 'TrackBar'
-cv.namedWindow('TrackBar')
-# cv.resizeWindow(source_window, 640, 480)
-max_thresh = 255
-thresh = 100  # initial threshold
-cv.createTrackbar('Canny Thresh:', bar, thresh, max_thresh, thresh_callback)
-thresh_callback(thresh)
-cv.waitKey()
-cv.destroyAllWindows()
-
-
-# img = cv.imread('drop.jpg')
-# content = img[200:1800,:]
-# cv.imshow('original', img)
-# cv.imshow('slide', content)
-# cv.waitKey()
+find_thresh()
