@@ -7,15 +7,58 @@
 # import numpy as np
 # from matplotlib import pyplot as plt
 
-from __future__ import print_function
+import cv2
 import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
+from matplotlib import pyplot as plt
+
+# part1
+# pic = 'drop0.jpg'
+# original = cv.imread(pic)
+# img = cv.imread(pic)
+# imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# ret, thresh = cv.threshold(imgray, 127, 255, 8)
+# contours, hierarchy = cv.findContours(thresh, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+# con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
+# # cnt = contours[3]
+# # con2 = cv.drawContours(img, [cnt], -1, (0,255,0), 2)
+# plt.subplot(121), plt.title('Original'), plt.imshow(original)
+# plt.subplot(122), plt.title('THRESH_TRIANGLE'), plt.imshow(con)
+# # plt.subplot(122), plt.title('Contour'), plt.imshow(con)
+# for cnt in contours:
+#     perimeter = cv.arcLength(cnt, True)
+#     print(perimeter)
+# plt.show()
+
+# part2
+# img = cv.imread('drop0.jpg', 0)
+# ret, th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+# th2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+# th3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 4)
+# ret, thresh = cv.threshold(th3, 127, 255, 8)
+#
+# # contours, hierarchy = cv.findContours(th3, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+# #
+# # # newImage = cv2.imread('white.jpg')
+# # # newImage = cv2.resize(newImage,(2560,1920))
+# # con = cv.drawContours(img, contours, -1, (0, 255, 0), 3)
+# # plt.imshow(th3, cmap='gray')
+# # plt.show()
+#
+#
+# titles = ['Original', 'Global Thresholding(v = 127)', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding']
+# images = [img, th1, th2, th3]
+# for i in range(4):
+#     plt.subplot(2, 2, i + 1), plt.imshow(images[i], 'gray')
+#     plt.title(titles[i])
+#     plt.xticks([]), plt.yticks([])
+# plt.show()
 
 #
-# # 引入图像
-# pic = 'drop.jpg'
+# 引入图像
+# pic = 'drop0.jpg'
 # black = np.zeros((1920, 2560, 3), np.uint8)  #黑色背景
 # img1 = cv.imread(pic, 0)    #灰度图像
 #
@@ -34,21 +77,21 @@ import random as rng
 #
 #
 # # 图像自适应阈值处理
-# blockSize越大，细节轮廓越少；C越大，阈值越小，应偏大
+# # blockSize越大，细节轮廓越少；C越大，阈值越小，应偏大
 # th1 = cv.adaptiveThreshold(img1, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 89, 25)
 # th1 = 255 - th1
 # plt.subplot(1, 2, 1), plt.imshow(img1, 'gray')
 # plt.subplot(1, 2, 2), plt.imshow(th1, 'gray')
 # plt.show()
+
+# canny边缘检测
+# minval = [40, 50, 60, 70]
+# maxval = [60, 65, 70, 75]
+# for i in range(4):
+#     canny = cv.Canny(th1, 50, maxval[i])
+#     plt.subplot(2, 2, i+1), plt.imshow(canny, 'gray')
 #
-# # canny边缘检测
-# # minval = [40, 50, 60, 70]
-# # maxval = [60, 65, 70, 75]
-# # for i in range(4):
-# #     canny = cv.Canny(th1, 50, maxval[i])
-# #     plt.subplot(2, 2, i+1), plt.imshow(canny, 'gray')
-# #
-# # plt.show()
+# plt.show()
 #
 #
 # findContours寻找轮廓
@@ -206,8 +249,8 @@ import random as rng
 
 # rng.seed(1895)
 #
-# img = cv.imread('drop.jpg')
-
+# img = cv.imread('drop0.jpg')
+#
 # def thresh_callback(val):
 #     threshold = val
 #     # Detect edges using Canny
@@ -241,17 +284,15 @@ import random as rng
 # src = cv.resize(src, (720, 540))
 # # Convert image to gray and blur it
 # src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-# src_gray = cv.blur(src_gray, (3, 3))
+# src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
 # # Create Window
 # source_window = 'Source'
 # cv.namedWindow(source_window)
 # cv.imshow(source_window, src)
-# bar = 'TrackBar'
-# cv.namedWindow('TrackBar')
 # # cv.resizeWindow(source_window, 640, 480)
 # max_thresh = 255
 # thresh = 100  # initial threshold
-# cv.createTrackbar('Canny Thresh:', bar, thresh, max_thresh, thresh_callback)
+# cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, thresh_callback)
 # thresh_callback(thresh)
 # cv.waitKey()
 # cv.destroyAllWindows()
@@ -261,19 +302,24 @@ rng.seed(1895)
 
 img = cv.imread('drop2.jpg')
 
-img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
-src = cv.resize(img, (720, 540))
+# 早期照片
+# img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
+# src = cv.resize(img, (720, 540))
+
+# 自拍照片
+img = img[120:820, 140:1140]  # 去掉上下文字信息，避免干扰（src比例为纵：横 = 7：10）
+src = cv.resize(img, (800, 560))
 src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-src_gray = cv.blur(src_gray, (3, 3))
+src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
 
 
 def find_thresh():
-    for threshold in range(255, 50, -1):
+    for threshold in range(50, 255, 1):
         # Detect edges using Canny
         canny_output = cv.Canny(src_gray, threshold, threshold * 2)
         # Find contours
         contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 4:
+        if len(contours) == 3:
             break
     # Draw contours
     print(threshold)
