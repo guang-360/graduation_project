@@ -14,55 +14,81 @@
 #     print_hi('PyCharm')
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-from __future__ import print_function
+import cv2
 import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
+from matplotlib import pyplot as plt
+import os
 
-rng.seed(12345)
 
+def find_thresh(picture, contours_number):
+    rng.seed(1895)
+    # print(picture)
+    img = cv.imread(picture)
+    # print(img)
 
-def thresh_callback(val):
-    threshold = val
-    # Detect edges using Canny
-    canny_output = cv.Canny(src_gray, threshold, threshold * 2)
-    # Find contours
-    contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    # 早期照片
+    # img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
+    # src = cv.resize(img, (720, 540))
+
+    # 自拍照片
+    img = img[120:920, 140:1140]  # 去掉上下文字信息，避免干扰（src比例为纵：横 = 8：10）
+    src = cv.resize(img, (800, 640))
+    src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+    src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
+    for threshold in range(50, 255, 1):
+        # Detect edges using Canny
+        canny_output = cv.Canny(src_gray, threshold, threshold * 2)
+        # Find contours
+        contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        if len(contours) == contours_number:
+            break
     # Draw contours
+    # print(threshold)
+
     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
     # drawing= cv.resize(drawing, (640, 480))
+    # 给轮廓随机取色
     for i in range(len(contours)):
         color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+    for cnt in contours:
+        perimeter = round(cv.arcLength(cnt, False), 1)
+        # print(perimeter)
+        cv.putText(drawing, str(perimeter), tuple(cnt[0][0] + [-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
+    # print(contours[0])
     # Show in a window
-    cv.imshow('Contours', drawing)
+
+    # Contour_window = 'Contours'
+    # cv.namedWindow(Contour_window)
+    # cv.imshow(Contour_window, drawing)
+    # cv.imshow('original', src)
+    # cv.waitKey()
+    return drawing
 
 
-# Load source image
-parser = argparse.ArgumentParser(description='Code for Finding contours in your image tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='drop.jpg')
-args = parser.parse_args()
-# src = cv.imread(cv.samples.findFile(arg.input))
-src = cv.imread('drop.jpg')
-if src is None:
-    print('Could not open or find the image:', args.input)
-    exit(0)
-src = cv.resize(src, (960, 720))
-# Convert image to gray and blur it
-src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-src_gray = cv.blur(src_gray, (3, 3))
-# Create Window
-source_window = 'Source'
-cv.namedWindow(source_window)
-cv.imshow(source_window, src)
-# cv.resizeWindow(source_window, 640, 480)
-max_thresh = 255
-thresh = 100  # initial threshold
-cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, thresh_callback)
-thresh_callback(thresh)
-cv.waitKey()
-cv.destroyAllWindows()
+def batch_contour(folder):
+    try:
+        os.mkdir(folder + '\\contours')
+    except:
+        pass
+    for file in os.listdir(folder):
+        if file.endswith('.jpg'):
+            result = find_thresh(folder+'\\'+file, 3)
+            cv.imwrite(folder + '\\contours\\con_' + file, result)
+        # img = cv.imread(file, 0)
+        # cv.imshow('picture', img)
+
+
+
+if __name__ == '__main__':
+    # path = 'E:\\python_opencv-main\\droplet_pic\\3_D_L\\3_D_400_H_L\\3_D_400_H_L_1'
+    path = 'E:\\python_opencv-main\\droplet_pic\\7_D_L\\7_D_1100_H_L\\7_D_1100_H_L_1'
+    batch_contour(path)
+    # find_thresh('drop.jpg', 4)
+
 
 # import numpy as np
 # import cv2
