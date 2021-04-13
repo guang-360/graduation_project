@@ -7,12 +7,15 @@
 # import numpy as np
 # from matplotlib import pyplot as plt
 
+import os
 import cv2
 import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
 from matplotlib import pyplot as plt
+from PIL import Image
+
 
 # part1
 # pic = 'drop0.jpg'
@@ -298,31 +301,29 @@ from matplotlib import pyplot as plt
 # cv.destroyAllWindows()
 
 
-rng.seed(1895)
+def find_thresh(picture, contours_number):
+    rng.seed(1895)
 
-img = cv.imread('drop2.jpg')
+    img = cv.imread(picture)
 
-# 早期照片
-# img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
-# src = cv.resize(img, (720, 540))
+    # 早期照片
+    # img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
+    # src = cv.resize(img, (720, 540))
 
-# 自拍照片
-img = img[120:820, 140:1140]  # 去掉上下文字信息，避免干扰（src比例为纵：横 = 7：10）
-src = cv.resize(img, (800, 560))
-src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
-
-
-def find_thresh():
+    # 自拍照片
+    img = img[120:920, 140:1140]  # 去掉上下文字信息，避免干扰（src比例为纵：横 = 8：10）
+    src = cv.resize(img, (800, 640))
+    src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+    src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
     for threshold in range(50, 255, 1):
         # Detect edges using Canny
         canny_output = cv.Canny(src_gray, threshold, threshold * 2)
         # Find contours
         contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 3:
+        if len(contours) == contours_number:
             break
     # Draw contours
-    print(threshold)
+    # print(threshold)
 
     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
     # drawing= cv.resize(drawing, (640, 480))
@@ -332,15 +333,23 @@ def find_thresh():
         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
     for cnt in contours:
         perimeter = round(cv.arcLength(cnt, False), 1)
-        print(perimeter)
-        cv.putText(drawing, str(perimeter), tuple(cnt[0][0]+[-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
+        # print(perimeter)
+        cv.putText(drawing, str(perimeter), tuple(cnt[0][0] + [-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
     # print(contours[0])
     # Show in a window
-    Contour_window = 'Contours'
-    cv.namedWindow(Contour_window)
-    cv.imshow(Contour_window, drawing)
-    cv.imshow('original', src)
-    cv.waitKey()
+    # Contour_window = 'Contours'
+    # cv.namedWindow(Contour_window)
+    # cv.imshow(Contour_window, drawing)
+    # cv.imshow('original', src)
+    # cv.waitKey()
+    save_path = '/Users/duoguangxu/Documents/毕设/dest/'+'con_'+picture
+    cv.imwrite(save_path, drawing)
 
 
-find_thresh()
+
+if __name__ == '__main__':
+    path = '/Users/duoguangxu/Documents/毕设/droplet_pic/7_D_L/7_D_640_H_L/7_D_640_H_L_2/'
+    files = os.listdir(path)
+    for file in files:
+        find_thresh(path+file, 3)
+    # find_thresh('drop.jpg', 3)
