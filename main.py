@@ -14,7 +14,6 @@ import numpy as np
 import argparse
 import random as rng
 from matplotlib import pyplot as plt
-from PIL import Image
 
 
 # part1
@@ -250,29 +249,6 @@ from PIL import Image
 #     cv2.waitKey(0)
 
 
-# rng.seed(1895)
-#
-# img = cv.imread('drop0.jpg')
-#
-# def thresh_callback(val):
-#     threshold = val
-#     # Detect edges using Canny
-#     canny_output = cv.Canny(src_gray, threshold, threshold * 2)
-#     # Find contours
-#     contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-#     # Draw contours
-#     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
-#     # drawing= cv.resize(drawing, (640, 480))
-#     # 给轮廓随机取色
-#     print(len(contours))
-#     for i in range(len(contours)):
-#         color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
-#         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
-#     # Show in a window
-#     Contour_window = 'Contours'
-#     cv.namedWindow(Contour_window)
-#     cv.imshow(Contour_window, drawing)
-#
 #
 # # Load source image
 # parser = argparse.ArgumentParser(description='Code for Finding contours in your image tutorial.')
@@ -302,19 +278,24 @@ from PIL import Image
 
 
 def find_thresh(picture, contours_number):
+    """picture为待处理图像，contours_number为预期获得轮廓的数量，返回以黑色为背景的同尺寸图像"""
     rng.seed(1895)
-
+    # 读取图像
     img = cv.imread(picture)
 
-    # 早期照片
+    # 早期照片裁剪
     # img = img[120:1800, 160:2400]  # 去掉上下文字信息，避免干扰（src比例为4：3）
     # src = cv.resize(img, (720, 540))
 
-    # 自拍照片
+    # 自拍照片裁剪
     img = img[120:920, 140:1140]  # 去掉上下文字信息，避免干扰（src比例为纵：横 = 8：10）
     src = cv.resize(img, (800, 640))
+
+    # 处理
     src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     src_gray = cv.GaussianBlur(src_gray, (3, 3), 1)
+
+    # 寻找合适的阈值来获取适当的轮廓数量
     for threshold in range(50, 255, 1):
         # Detect edges using Canny
         canny_output = cv.Canny(src_gray, threshold, threshold * 2)
@@ -322,34 +303,46 @@ def find_thresh(picture, contours_number):
         contours, hierarchy = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
         if len(contours) == contours_number:
             break
-    # Draw contours
-    # print(threshold)
+    # print(threshold)      #显示当前阈值的取值
 
+    # 取同样尺寸黑色背景
     drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
-    # drawing= cv.resize(drawing, (640, 480))
+
     # 给轮廓随机取色
     for i in range(len(contours)):
         color = (rng.randint(0, 256), rng.randint(0, 256), rng.randint(0, 256))
         cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+
+    # 计算每条轮廓的周长并在图像中显示
     for cnt in contours:
         perimeter = round(cv.arcLength(cnt, False), 1)
         # print(perimeter)
         cv.putText(drawing, str(perimeter), tuple(cnt[0][0] + [-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
-    # print(contours[0])
+
+    # 显示原图与处理结果图
     # Show in a window
     # Contour_window = 'Contours'
     # cv.namedWindow(Contour_window)
     # cv.imshow(Contour_window, drawing)
     # cv.imshow('original', src)
     # cv.waitKey()
-    save_path = '/Users/duoguangxu/Documents/毕设/dest/'+'con_'+picture
-    cv.imwrite(save_path, drawing)
+    return drawing
 
+
+def batch_contour(folder):
+    """批量处理文件夹中的图像，并将结果保存在当前目录下的contours文件夹中。"""
+    try:
+        os.mkdir(folder + '/contours')
+    except:
+        pass
+    for file in os.listdir(folder):
+        if file.endswith('.jpg'):
+            result = find_thresh(folder+'/'+file, 3)
+            cv.imwrite(folder + '/contours/con_' + file, result)
+        # img = cv.imread(file, 0)
+        # cv.imshow('picture', img)
 
 
 if __name__ == '__main__':
-    path = '/Users/duoguangxu/Documents/毕设/droplet_pic/7_D_L/7_D_640_H_L/7_D_640_H_L_2/'
-    files = os.listdir(path)
-    for file in files:
-        find_thresh(path+file, 3)
-    # find_thresh('drop.jpg', 3)
+    path = '/Users/duoguangxu/Documents/droplet_pic/3_D_L/3_D_940_H_L/3_D_940_H_L_3'
+    batch_contour(path)
