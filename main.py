@@ -277,8 +277,8 @@ from matplotlib import pyplot as plt
 # cv.destroyAllWindows()
 
 
-def find_thresh(picture, contours_number):
-    """picture为待处理图像，contours_number为预期获得轮廓的数量，返回以黑色为背景的同尺寸图像"""
+def find_thresh(picture, contours_number, show):
+    """picture为待处理图像，contours_number为预期获得轮廓的数量，show如果为1将即时显示图像结果"""
     rng.seed(1895)
     # 读取图像
     img = cv.imread(picture)
@@ -321,12 +321,14 @@ def find_thresh(picture, contours_number):
 
     # 显示原图与处理结果图
     # Show in a window
-    # Contour_window = 'Contours'
-    # cv.namedWindow(Contour_window)
-    # cv.imshow(Contour_window, drawing)
-    # cv.imshow('original', src)
-    # cv.waitKey()
-    return drawing
+    if show == 1:
+        Contour_window = 'Contours'
+        cv.namedWindow(Contour_window)
+        cv.imshow(Contour_window, drawing)
+        cv.imshow('original', src)
+        cv.waitKey()
+    else:
+        return drawing
 
 
 def batch_contour(folder):
@@ -337,12 +339,16 @@ def batch_contour(folder):
         pass
     for file in os.listdir(folder):
         if file.endswith('.jpg'):
-            result = find_thresh(folder+'/'+file, 3)
+            result = find_thresh(folder + '/' + file, 3, 0)
             cv.imwrite(folder + '/contours/con_' + file, result)
-        # img = cv.imread(file, 0)
-        # cv.imshow('picture', img)
 
 
 if __name__ == '__main__':
-    path = '/Users/duoguangxu/Documents/droplet_pic/3_D_L/3_D_940_H_L/3_D_940_H_L_3'
-    batch_contour(path)
+
+    # 批处理
+    # path = '/Users/duoguangxu/Documents/droplet_pic/3_D_L/3_D_940_H_L/3_D_940_H_L_2'
+    # batch_contour(path)
+
+    # 单张图像测试
+    pic = 'drop.jpg'
+    find_thresh(pic, 3, 1)
