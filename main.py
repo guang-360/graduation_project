@@ -11,8 +11,8 @@ import os
 import cv2
 import cv2 as cv
 import numpy as np
-import argparse
 import random as rng
+import time
 from matplotlib import pyplot as plt
 
 
@@ -346,11 +346,15 @@ def batch_contour(folder):
 
 if __name__ == '__main__':
 
+    start = time.time()
     #### 批处理
     #### if running in Windows OS, replace '/' with '\\' in path
-    path = '/Users/duoguangxu/Documents/drop_pic/13_D_L/13_D_940_H_L/13_D_940_H_L_2'
+    path = '/Users/duoguangxu/Documents/drop_pic/13_D_L/13_D_1110_H_L/13_D_1110_H_L_3'
     batch_contour(path)
 
     # 单张图像测试
     # pic = 'regular_3.jpg'
     # find_thresh(pic, 2, 1)
+
+    end = time.time()
+    print(str(end-start))
