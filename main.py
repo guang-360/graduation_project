@@ -315,8 +315,9 @@ def find_thresh(picture, contours_number, show):
 
     # 计算每条轮廓的周长并在图像中显示
     for cnt in contours:
-        perimeter = round(cv.arcLength(cnt, False), 1)
-        # print(perimeter)
+        perimeter = round(cv.arcLength(cnt, True), 1)
+        if show==1:
+            print(perimeter)
         cv.putText(drawing, str(perimeter), tuple(cnt[0][0] + [-10, -10]), cv.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
 
     # 显示原图与处理结果图
@@ -335,20 +336,21 @@ def batch_contour(folder):
     """批量处理文件夹中的图像，并将结果保存在当前目录下的contours文件夹中。"""
     try:
         os.mkdir(folder + '/contours')
+        for file in os.listdir(folder):
+            if file.endswith('.jpg'):
+                result = find_thresh(folder + '/' + file, 3, 0)
+                cv.imwrite(folder + '/contours/con_' + file, result)
     except:
         pass
-    for file in os.listdir(folder):
-        if file.endswith('.jpg'):
-            result = find_thresh(folder + '/' + file, 3, 0)
-            cv.imwrite(folder + '/contours/con_' + file, result)
 
 
 if __name__ == '__main__':
 
-    # 批处理
-    # path = '/Users/duoguangxu/Documents/droplet_pic/3_D_L/3_D_940_H_L/3_D_940_H_L_2'
-    # batch_contour(path)
+    #### 批处理
+    #### if running in Windows OS, replace '/' with '\\' in path
+    path = '/Users/duoguangxu/Documents/drop_pic/13_D_L/13_D_940_H_L/13_D_940_H_L_2'
+    batch_contour(path)
 
     # 单张图像测试
-    pic = 'drop.jpg'
-    find_thresh(pic, 3, 1)
+    # pic = 'regular_3.jpg'
+    # find_thresh(pic, 2, 1)
